@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="twitterBlue">#1DA1F2</color>
+    <color name="primaryText">#EDEDED</color>
+    <color name="secondaryText">#ADADB1</color>
+    <color name="backgroundColor">#243447</color>
+    <color name="toolbarColor">#1A2533</color>
+</resources>
