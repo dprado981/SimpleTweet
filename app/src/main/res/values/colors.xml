@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="twitterBlue">#1DA1F2</color>
-    <color name="primaryText">#EDEDED</color>
-    <color name="secondaryText">#ADADB1</color>
-    <color name="backgroundColor">#243447</color>
-    <color name="toolbarColor">#1A2533</color>
+    <color name="primary_text">#FFFFFFFF</color>
+    <color name="twitter_blue_dark">#FF16202C</color>
+    <color name="twitter_blue_darker">#000000</color>
+    <color name="twitter_blue">#FF20A1F1</color>
+    <color name="secondary_text">#FF8799A6</color>
+    <color name="accent">#FFE1255E</color>
 </resources>
