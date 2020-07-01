@@ -76,6 +76,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         TextView tvBody;
         CardView cvAttachedImage;
         ImageView ivAttachedImage;
+        TextView tvRetweetCount;
+        TextView tvFavoriteCount;
 
         // itemView is a representation of one row in the RecyclerView (aka one Tweet)
         public ViewHolder(@NonNull View itemView) {
@@ -85,6 +87,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvBody = itemView.findViewById(R.id.tvBody);
             cvAttachedImage = itemView.findViewById(R.id.cvAttachedImage);
             ivAttachedImage = itemView.findViewById(R.id.ivAttachedImage);
+            tvRetweetCount = itemView.findViewById(R.id.tvRetweetCount);
+            tvFavoriteCount = itemView.findViewById(R.id.tvFavoriteCount);
         }
 
         @SuppressLint("SetTextI18n")
@@ -92,6 +96,14 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             Glide.with(context).load(tweet.user.profileImageUrl).into(ivProfileImage);
             tvScreenName.setText(tweet.user.screenName +  " · " + getRelativeTimeAgo(tweet.createdAt));
             tvBody.setText(tweet.body);
+            if (tweet.retweeted) {
+                tvRetweetCount.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_vector_retweeted, 0, 0, 0);
+            }
+            if (tweet.favorited) {
+                tvFavoriteCount.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_vector_favorited, 0, 0, 0);
+            }
+            tvRetweetCount.setText(Integer.toString(tweet.retweetCount));
+            tvFavoriteCount.setText(Integer.toString(tweet.favoriteCount));
             addImageFromTweet(tweet);
         }
 

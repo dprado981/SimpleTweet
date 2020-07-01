@@ -104,7 +104,7 @@ public class ComposeActivity extends AppCompatActivity {
                 charCount = charSequence.length();
                 tvCount.setText(format("%-3d/%d", charCount, MAX_TWEET_LENGTH));
                 if (charCount >= MAX_TWEET_LENGTH) {
-                    tvCount.setTextColor(ContextCompat.getColor(context, R.color.accent));
+                    tvCount.setTextColor(ContextCompat.getColor(context, R.color.accent_red));
                 }
             }
 
