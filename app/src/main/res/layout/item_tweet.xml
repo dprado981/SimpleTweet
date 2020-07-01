@@ -39,7 +39,8 @@
         android:layout_toEndOf="@+id/ivProfileImage"
         android:textColor="@color/primary_text"
         tools:text="This is a sample tweet"
-        android:autoLink="web"/>
+        android:autoLink="web"
+        android:textColorLink="@color/link_blue"/>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cvAttachedImage"

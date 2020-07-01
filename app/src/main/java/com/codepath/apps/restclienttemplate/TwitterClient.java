@@ -1,5 +1,6 @@
 package com.codepath.apps.restclienttemplate;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import com.codepath.asynchttpclient.RequestParams;
@@ -74,6 +75,14 @@ public class TwitterClient extends OAuthBaseClient {
 	// Favorite a single tweet
 	public void toggleFavorite(boolean favorited, long id, JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl(String.format("/favorites/%s.json", (favorited ? "destroy" : "create")));
+		RequestParams params = new RequestParams();
+		params.put("id", id);
+		client.post(apiUrl, params, "", handler);
+	}
+
+	public void toggleRetweet(boolean retweeted, long id, JsonHttpResponseHandler handler) {
+		@SuppressLint("DefaultLocale")
+		String apiUrl = getApiUrl(String.format("/statuses/%sretweet/%d.json", (retweeted ? "un" : ""), id));
 		RequestParams params = new RequestParams();
 		params.put("id", id);
 		client.post(apiUrl, params, "", handler);

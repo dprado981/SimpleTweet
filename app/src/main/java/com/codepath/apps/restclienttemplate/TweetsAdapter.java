@@ -58,15 +58,35 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         // Bind the Tweet with the ViewHolder
         holder.bind(tweet);
 
-        TextView tvRetweetCount = holder.tvRetweetCount;
+        final TextView tvRetweetCount = holder.tvRetweetCount;
         final TextView tvFavoriteCount = holder.tvFavoriteCount;
         tvRetweetCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Make Request to retweet post
-                System.out.println("hello");
+                client.toggleRetweet(tweet.retweeted, tweet.id, new JsonHttpResponseHandler() {
+                    @SuppressLint("DefaultLocale")
+                    @Override
+                    public void onSuccess(int statusCode, Headers headers, JSON json) {
+                        Log.i(TAG, "onSuccess for toggleRetweet: " + json);
+                        tweet.retweeted = !tweet.retweeted;
+                        int updatedImage;
+                        int updatedCount = tweet.retweetCount;
+                        if (tweet.retweeted) {
+                            updatedImage = R.drawable.ic_vector_retweeted;
+                        } else {
+                            updatedImage = R.drawable.ic_vector_retweet;
+                            updatedCount--;
+                        }
+                        tvRetweetCount.setCompoundDrawablesWithIntrinsicBounds(updatedImage, 0, 0, 0);
+                        tvRetweetCount.setText(String.format("%d", updatedCount));
+                    }
 
-                // update locally
+                    @Override
+                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                        Log.d(TAG, "onFailure for toggleRetweet: " + response, throwable);
+                    }
+                });
             }
         });
         tvFavoriteCount.setOnClickListener(new View.OnClickListener() {
@@ -77,7 +97,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     @SuppressLint("DefaultLocale")
                     @Override
                     public void onSuccess(int statusCode, Headers headers, JSON json) {
-                        Log.i(TAG, "onSuccess for toggleFavorite: " + json);
+                        Log.i(TAG, "onSuccess for toggleFavorite: " + json.toString());
                         tweet.favorited = !tweet.favorited;
                         int updatedImage;
                         int updatedCount = tweet.favoriteCount;
@@ -141,7 +161,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         @SuppressLint("SetTextI18n")
         public void bind(Tweet tweet) {
             Glide.with(context).load(tweet.user.profileImageUrl).into(ivProfileImage);
-            tvScreenName.setText(tweet.user.screenName +  " · " + getRelativeTimeAgo(tweet.createdAt));
+            tvScreenName.setText("@"+tweet.user.screenName +  " · " + getRelativeTimeAgo(tweet.createdAt));
             tvBody.setText(tweet.body);
             if (tweet.retweeted) {
                 tvRetweetCount.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_vector_retweeted, 0, 0, 0);

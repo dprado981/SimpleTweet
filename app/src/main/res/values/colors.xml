@@ -7,4 +7,5 @@
     <color name="secondary_text">#FF8799A6</color>
     <color name="accent_red">#FFE1255E</color>
     <color name="accent_green">#FF17BF63</color>
+    <color name="link_blue">#FF1B95E0</color>
 </resources>
