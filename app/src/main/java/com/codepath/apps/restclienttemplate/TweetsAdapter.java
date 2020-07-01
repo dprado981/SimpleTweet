@@ -16,23 +16,29 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
+import okhttp3.Headers;
 
 public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder> {
 
     Context context;
     List<Tweet> tweets;
+    TwitterClient client;
     public static final String TAG = "TweetsAdapter";
+
     // Pass in the context and list of tweets
     public TweetsAdapter(Context context, List<Tweet> tweets) {
         this.context = context;
         this.tweets = tweets;
+        client = TwitterApp.getRestClient(context);
     }
 
     // For each row, inflate the layout for a tweet
@@ -48,9 +54,50 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // Get the data
-        Tweet tweet = tweets.get(position);
+        final Tweet tweet = tweets.get(position);
         // Bind the Tweet with the ViewHolder
         holder.bind(tweet);
+
+        TextView tvRetweetCount = holder.tvRetweetCount;
+        final TextView tvFavoriteCount = holder.tvFavoriteCount;
+        tvRetweetCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Make Request to retweet post
+                System.out.println("hello");
+
+                // update locally
+            }
+        });
+        tvFavoriteCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Make Request to favorite post
+                client.toggleFavorite(tweet.favorited, tweet.id, new JsonHttpResponseHandler() {
+                    @SuppressLint("DefaultLocale")
+                    @Override
+                    public void onSuccess(int statusCode, Headers headers, JSON json) {
+                        Log.i(TAG, "onSuccess for toggleFavorite: " + json);
+                        tweet.favorited = !tweet.favorited;
+                        int updatedImage;
+                        int updatedCount = tweet.favoriteCount;
+                        if (tweet.favorited) {
+                            updatedImage = R.drawable.ic_vector_favorited;
+                        } else {
+                            updatedImage = R.drawable.ic_vector_favorite;
+                            updatedCount--;
+                        }
+                        tvFavoriteCount.setCompoundDrawablesWithIntrinsicBounds(updatedImage, 0, 0, 0);
+                        tvFavoriteCount.setText(String.format("%d", updatedCount));
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                        Log.d(TAG, "onFailure for toggleFavorite: " + response, throwable);
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -107,16 +154,11 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             addImageFromTweet(tweet);
         }
 
-        private void addImageFromTweet(Tweet tweet) {
+        private void addImageFromTweet(@NotNull Tweet tweet) {
             if (tweet.imageUrl.isEmpty()) {
                 cvAttachedImage.setVisibility(View.GONE);
             } else {
-                Glide.with(context)
-                        .load(tweet.imageUrl)
-                        .centerCrop()
-                        .placeholder(R.drawable.ic_twitter_logo_blue)
-                        .transform(new RoundedCornersTransformation(300, 5))
-                        .into(ivAttachedImage);
+                Glide.with(context).load(tweet.imageUrl).into(ivAttachedImage);
             }
         }
     }

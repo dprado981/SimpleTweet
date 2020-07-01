@@ -56,7 +56,7 @@ public class TimelineActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayUseLogoEnabled(true);
          */
 
-        client = TwitterApp.getRestClient(this);
+        client = TwitterApp.getRestClient(context);
         tweetDao = ((TwitterApp) getApplicationContext()).getMyDatabase().tweetDao();
 
         // Find the RecyclerView

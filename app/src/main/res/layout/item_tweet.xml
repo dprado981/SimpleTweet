@@ -38,17 +38,19 @@
         android:layout_marginBottom="10dp"
         android:layout_toEndOf="@+id/ivProfileImage"
         android:textColor="@color/primary_text"
-        tools:text="This is a sample tweet" />
+        tools:text="This is a sample tweet"
+        android:autoLink="web"/>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cvAttachedImage"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_below="@+id/tvBody"
-        android:layout_marginStart="50dp"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
+        android:layout_toEndOf="@+id/ivProfileImage"
         android:elevation="10dp"
         android:visibility="visible"
         app:cardCornerRadius="8dp"
@@ -71,7 +73,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/cvAttachedImage"
-        android:layout_marginStart="50dp"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@+id/ivProfileImage"
         android:weightSum="3">
 
 
@@ -79,31 +82,32 @@
             android:id="@+id/tvReplyCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="2dp"
-            android:textColor="@color/secondary_text"
-            tools:text="100"
+            android:layout_marginStart="0dp"
+            android:layout_weight="1"
             android:drawableStart="@drawable/ic_vector_reply"
-            android:layout_weight="1"/>
+            android:textColor="@color/secondary_text" />
 
         <TextView
             android:id="@+id/tvRetweetCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"
-            android:textColor="@color/secondary_text"
-            tools:text="100"
+            android:layout_weight="1"
             android:drawableStart="@drawable/ic_vector_retweet"
-            android:layout_weight="1"/>
+            android:drawablePadding="5dp"
+            android:textColor="@color/secondary_text"
+            tools:text="100" />
 
         <TextView
             android:id="@+id/tvFavoriteCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"
-            android:textColor="@color/secondary_text"
-            tools:text="100"
+            android:layout_weight="1"
             android:drawableStart="@drawable/ic_vector_favorite"
-            android:layout_weight="1"/>
+            android:drawablePadding="5dp"
+            android:textColor="@color/secondary_text"
+            tools:text="100" />
 
     </LinearLayout>
 
