@@ -13,7 +13,8 @@
         android:icon="@drawable/ic_twitter_logo_blue"
         android:label="SimpleTweet"
         android:theme="@style/AppTheme">
-        <activity android:name=".ComposeActivity"></activity>
+        <activity android:name=".ProfileActivity"></activity>
+        <activity android:name=".TweetDetailActivity" />
         <activity android:name=".TimelineActivity" />
         <activity
             android:name=".LoginActivity"

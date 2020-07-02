@@ -2,23 +2,38 @@ package com.codepath.apps.restclienttemplate;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.format.DateUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.codepath.apps.restclienttemplate.models.ComposeDialogFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.apps.restclienttemplate.models.User;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.jetbrains.annotations.NotNull;
+import org.parceler.Parcels;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,6 +75,25 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
         final TextView tvRetweetCount = holder.tvRetweetCount;
         final TextView tvFavoriteCount = holder.tvFavoriteCount;
+        final TextView tvReplyCount = holder.tvReplyCount;
+        final ImageView ivProfileImage  = holder.ivProfileImage;
+        final TextView tvScreenName  = holder.tvScreenName;
+        final LinearLayout llContent = holder.llContent;
+        final TextView tvBody = holder.tvBody;
+        final ImageView ivAttachedImage = holder.ivAttachedImage;
+
+        getClickables(holder.tvBody, tweet);
+
+        tvReplyCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Show DialogFragment to create tweet
+                FragmentManager fm = ((FragmentActivity) context).getSupportFragmentManager();
+                ComposeDialogFragment editNameDialogFragment = ComposeDialogFragment.newInstance(tweet);
+                editNameDialogFragment.show(fm, "fragment_compose");
+            }
+        });
+
         tvRetweetCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,6 +123,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                 });
             }
         });
+
         tvFavoriteCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -118,6 +153,109 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                 });
             }
         });
+
+        ivProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "going to profile page");
+                Intent intent = new Intent(context, ProfileActivity.class);
+                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(tweet.user));
+                context.startActivity(intent);
+            }
+        });
+
+        tvScreenName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "going to profile page");
+            }
+        });
+
+        llContent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "going to details page");
+                Intent intent = new Intent(context, TweetDetailActivity.class);
+                intent.putExtra(Tweet.class.getSimpleName(), Parcels.wrap(tweet));
+                context.startActivity(intent);
+            }
+        });
+
+        tvBody.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "going to details page");
+                Intent intent = new Intent(context, TweetDetailActivity.class);
+                intent.putExtra(Tweet.class.getSimpleName(), Parcels.wrap(tweet));
+                context.startActivity(intent);
+            }
+        });
+        ivAttachedImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "going to details page");
+                Intent intent = new Intent(context, TweetDetailActivity.class);
+                intent.putExtra(Tweet.class.getSimpleName(), Parcels.wrap(tweet));
+                context.startActivity(intent);
+            }
+        });
+
+    }
+
+    private void getClickables(TextView tvBody, final Tweet tweet) {
+
+        SpannableString ss = new SpannableString(tvBody.getText());
+        ClickableSpan clickableSpanAt = new ClickableSpan() {
+            @Override
+            public void onClick(@NotNull View textView) {
+                Log.i(TAG, "clicking @");
+            }
+            @Override
+            public void updateDrawState(@NotNull TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(false);
+            }
+        };
+        ClickableSpan clickableSpanTag = new ClickableSpan() {
+            @Override
+            public void onClick(@NotNull View textView) {
+                Log.i(TAG, "clicking #");
+            }
+            @Override
+            public void updateDrawState(@NotNull TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(false);
+            }
+        };
+
+        String body = tvBody.getText().toString() + " ";
+
+        int indexOfAt = -1;
+        int indexOfTag = -1;
+        for (int i = 0; i < body.length(); i++) {
+            if (body.charAt(i) == ' ') {
+                if (indexOfAt >= 0) {
+                    ss.setSpan(clickableSpanAt, indexOfAt, i, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    ss.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.link_blue)),
+                            indexOfAt, i, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    indexOfAt = -1;
+
+                } else if (indexOfTag >= 0) {
+                    ss.setSpan(clickableSpanTag, indexOfTag, i, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    ss.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.link_blue)),
+                            indexOfTag, i, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    indexOfTag = -1;
+                }
+            } else if (body.charAt(i) == '@') {
+                indexOfAt = i;
+            } else if (body.charAt(i) == '#') {
+                indexOfTag = i;
+            }
+        }
+
+        tvBody.setText(ss);
+        tvBody.setMovementMethod(LinkMovementMethod.getInstance());
+        tvBody.setHighlightColor(Color.TRANSPARENT);
     }
 
     @Override
@@ -143,8 +281,10 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         TextView tvBody;
         CardView cvAttachedImage;
         ImageView ivAttachedImage;
+        TextView tvReplyCount;
         TextView tvRetweetCount;
         TextView tvFavoriteCount;
+        LinearLayout llContent;
 
         // itemView is a representation of one row in the RecyclerView (aka one Tweet)
         public ViewHolder(@NonNull View itemView) {
@@ -154,8 +294,10 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvBody = itemView.findViewById(R.id.tvBody);
             cvAttachedImage = itemView.findViewById(R.id.cvAttachedImage);
             ivAttachedImage = itemView.findViewById(R.id.ivAttachedImage);
+            tvReplyCount = itemView.findViewById(R.id.tvReplyCount);
             tvRetweetCount = itemView.findViewById(R.id.tvRetweetCount);
             tvFavoriteCount = itemView.findViewById(R.id.tvFavoriteCount);
+            llContent = itemView.findViewById(R.id.llContent);
         }
 
         @SuppressLint("SetTextI18n")

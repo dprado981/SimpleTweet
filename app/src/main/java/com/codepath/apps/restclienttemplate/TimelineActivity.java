@@ -8,14 +8,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.codepath.apps.restclienttemplate.models.ComposeDialogFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.apps.restclienttemplate.models.TweetDao;
 import com.codepath.apps.restclienttemplate.models.TweetWithUser;
@@ -27,11 +31,12 @@ import org.json.JSONException;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import okhttp3.Headers;
 
-public class TimelineActivity extends AppCompatActivity {
+public class TimelineActivity extends AppCompatActivity implements ComposeDialogFragment.ComposeDialogListener {
 
     TweetDao tweetDao;
     TwitterClient client;
@@ -101,7 +106,9 @@ public class TimelineActivity extends AppCompatActivity {
             public void run() {
                 Log.i(TAG, "Showing data from database");
                 List<TweetWithUser> tweetWithUsers = tweetDao.recentItems();
+                Collections.reverse(tweetWithUsers);
                 List<Tweet> tweetsFromDB = TweetWithUser.getTweetList(tweetWithUsers);
+                Log.d(TAG, "tweetsFromDB.size(): " + tweetsFromDB.size());
                 adapter.clear();
                 adapter.addAll(tweetsFromDB);
             }
@@ -113,7 +120,7 @@ public class TimelineActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // Store instance of the menu item containing progress
-         miActionProgressItem = menu.findItem(R.id.miActionProgress);
+        miActionProgressItem = menu.findItem(R.id.miActionProgress);
         // Return to finish
         return super.onPrepareOptionsMenu(menu);
     }
@@ -146,8 +153,13 @@ public class TimelineActivity extends AppCompatActivity {
         // Compose icon has been selected
         if (item.getItemId() == R.id.compose) {
             // Navigate to the compose activity
-            Intent intent = new Intent(context, ComposeActivity.class);
+            /*Intent intent = new Intent(context, ComposeActivity.class);
             startActivityForResult(intent, REQUEST_CODE);
+             */
+            // Show DialogFragment to create tweet
+            FragmentManager fm = ((FragmentActivity) context).getSupportFragmentManager();
+            ComposeDialogFragment editNameDialogFragment = ComposeDialogFragment.newInstance(ComposeDialogFragment.NO_REPLY);
+            editNameDialogFragment.show(fm, "fragment_compose");
             return true;
         }
         return false;
@@ -233,4 +245,32 @@ public class TimelineActivity extends AppCompatActivity {
             }
         });
     }
+
+    // Post Tweet once 'Tweet' button is clicked
+    @Override
+    public void onFinishComposeDialog(String inputText) {
+        client.publishTweet(inputText, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                Log.i(TAG, "onSuccess to publishTweet");
+                try {
+                    Tweet tweet = Tweet.fromJson(json.jsonObject);
+                    tweets.add(0,tweet);
+                    adapter.notifyItemInserted(0);
+                    rvTweets.smoothScrollToPosition(0);
+                    Log.i(TAG, "Published tweet: " + tweet.body);
+                    Toast.makeText(context, "Nice Tweet!", Toast.LENGTH_LONG).show();
+                    populateHomeTimeline();
+                } catch (JSONException e) {
+                    Log.e(TAG, "JSON exception");
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG, "onFailure to publishTweet", throwable);
+            }
+        });
+    }
+
 }

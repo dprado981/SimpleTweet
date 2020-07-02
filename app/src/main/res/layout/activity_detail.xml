@@ -3,20 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="10dp"
-    android:layout_marginTop="10dp"
-    android:layout_marginEnd="10dp"
-    android:layout_marginBottom="10dp"
+    android:layout_height="match_parent"
+    android:layout_marginStart="0dp"
+    android:layout_marginTop="0dp"
+    android:layout_marginEnd="0dp"
+    android:layout_marginBottom="0dp"
     android:background="@color/twitter_blue_dark">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/ivProfileImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="5dp"
         app:civ_border_color="#FF000000"
         app:civ_border_width="0dp"
+        tools:layout_marginStart="5dp"
         tools:src="@tools:sample/backgrounds/scenic"
         tools:srcCompat="@tools:sample/avatars" />
 
@@ -36,10 +36,8 @@
         android:layout_below="@id/tvScreenName"
         android:layout_marginStart="5dp"
         android:layout_marginTop="0dp"
-        android:layout_toEndOf="@id/ivProfileImage"
-        android:orientation="vertical"
-        android:clickable="true"
-        android:focusable="true">
+        android:layout_toEndOf="@+id/ivProfileImage"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/tvBody"
@@ -55,23 +53,25 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cvAttachedImage"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
             android:elevation="10dp"
             android:visibility="visible"
             app:cardCornerRadius="8dp"
-            app:cardPreventCornerOverlap="false"
-            app:cardUseCompatPadding="true">
+            app:cardPreventCornerOverlap="true"
+            app:cardUseCompatPadding="true"
+            tools:layout_marginStart="-5dp">
 
             <ImageView
                 android:id="@+id/ivAttachedImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="-5dp"
+                android:adjustViewBounds="true"
                 android:contentDescription="@string/attachedimage"
-                android:scaleType="centerCrop"
+                android:scaleType="fitStart"
                 tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
         </androidx.cardview.widget.CardView>
@@ -84,7 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/llContent"
         android:layout_marginStart="5dp"
-        android:layout_toEndOf="@id/ivProfileImage"
+        android:layout_toEndOf="@+id/ivProfileImage"
         android:weightSum="3">
 
         <TextView
@@ -120,5 +120,14 @@
 
     </LinearLayout>
 
+    <!--
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvReplies"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/llButtons"
+        android:layout_marginStart="55dp"
+        android:scrollbars="vertical" />
+     -->
 
 </RelativeLayout>

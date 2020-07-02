@@ -2,6 +2,7 @@ package com.codepath.apps.restclienttemplate;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 
 import com.codepath.asynchttpclient.RequestParams;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -26,6 +27,7 @@ public class TwitterClient extends OAuthBaseClient {
 	public static final String REST_URL = "https://api.twitter.com/1.1";
 	public static final String REST_CONSUMER_KEY = BuildConfig.CONSUMER_KEY;
 	public static final String REST_CONSUMER_SECRET = BuildConfig.CONSUMER_SECRET;
+	public static final String TAG = "TwitterClient";
 
 	// Landing page to indicate the OAuth flow worked in case Chrome for Android 25+ blocks navigation back to the app.
 	public static final String FALLBACK_URL = "https://codepath.github.io/android-rest-client-template/success.html";
@@ -48,6 +50,7 @@ public class TwitterClient extends OAuthBaseClient {
 		String apiUrl = getApiUrl("/statuses/home_timeline.json");
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
+		params.put("tweet_mode", "extended");
 		params.put("count", 25);
 		params.put("since_id", 1);
 		client.get(apiUrl, params, handler);
@@ -64,11 +67,16 @@ public class TwitterClient extends OAuthBaseClient {
 	}
 
 	// Publish a single tweet
-	public void publishTweet(String tweetContent, JsonHttpResponseHandler handler) {
+	public void publishTweet(String inputText, JsonHttpResponseHandler handler) {
+		Log.d(TAG, "help");
+		String[] splitTweet = inputText.split("/",2);
+		String replyingToId = splitTweet[0];
+		String tweetContent = splitTweet[1];
 		String apiUrl = getApiUrl("/statuses/update.json");
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
 		params.put("status", tweetContent);
+		params.put("in_reply_to_status_id", replyingToId);
 		client.post(apiUrl, params, "", handler);
 	}
 
@@ -86,6 +94,20 @@ public class TwitterClient extends OAuthBaseClient {
 		RequestParams params = new RequestParams();
 		params.put("id", id);
 		client.post(apiUrl, params, "", handler);
+	}
+
+	public void getFollowers(long userId, JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("/followers/list.json");
+		RequestParams params = new RequestParams();
+		params.put("user_id", userId);
+		client.get(apiUrl, params, handler);
+	}
+
+	public void getFriends(long userId, JsonHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("/friends/list.json");
+		RequestParams params = new RequestParams();
+		params.put("user_id", userId);
+		client.get(apiUrl, params, handler);
 	}
 
 

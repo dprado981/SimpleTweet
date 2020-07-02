@@ -11,5 +11,8 @@
     <string name="attachedimage">AttachedImage</string>
     <string name="loading">Loading…</string>
     <string name="reply">reply</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <string name="banner">banner</string>
 
 </resources>

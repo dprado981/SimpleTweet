@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcel;
@@ -28,6 +29,9 @@ public class User {
     @ColumnInfo
     public String profileImageUrl;
 
+    @ColumnInfo
+    public String profileBannerUrl;
+
     // Empty constructor needed for Parceler library
     public User(){}
 
@@ -37,6 +41,12 @@ public class User {
         user.name = jsonObject.getString("name");
         user.screenName = jsonObject.getString("screen_name");
         user.profileImageUrl = jsonObject.getString("profile_image_url_https");
+        user.profileImageUrl = user.profileImageUrl.replace("_normal", "");
+        try {
+            user.profileBannerUrl = jsonObject.getString("profile_banner_url");
+        } catch (JSONException e) {
+            user.profileBannerUrl = "";
+        }
         return user;
     }
 
@@ -48,4 +58,13 @@ public class User {
         }
         return users;
     }
+
+    public static List<User> fromJsonArray(JSONArray jsonArray) throws JSONException {
+        List<User> users = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            users.add(fromJson(jsonArray.getJSONObject(i)));
+        }
+        return users;
+    }
+
 }

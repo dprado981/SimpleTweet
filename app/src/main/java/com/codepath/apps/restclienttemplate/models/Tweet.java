@@ -58,8 +58,7 @@ public class Tweet {
 
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
         Tweet tweet = new Tweet();
-        System.out.println(jsonObject);
-        tweet.body = jsonObject.getString("text");
+        tweet.body = jsonObject.getString("full_text");
         tweet.createdAt = jsonObject.getString("created_at");
         User user = User.fromJson(jsonObject.getJSONObject("user"));
         tweet.user = user;
