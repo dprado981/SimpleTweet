@@ -27,6 +27,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.codepath.apps.restclienttemplate.databinding.ItemTweetBinding;
 import com.codepath.apps.restclienttemplate.models.ComposeDialogFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.apps.restclienttemplate.models.User;
@@ -47,6 +48,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     Context context;
     List<Tweet> tweets;
     TwitterClient client;
+    ItemTweetBinding binding;
     public static final String TAG = "TweetsAdapter";
 
     // Pass in the context and list of tweets
@@ -60,34 +62,38 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_tweet, parent, false);
+        binding = ItemTweetBinding.inflate((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)
+                , parent, false);
+        View view = binding.getRoot();
         return new ViewHolder(view);
     }
 
     // Bind values based on the position of the element
     // RecyclerView tells us the position of the element
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         // Get the data
-        final Tweet tweet = tweets.get(position);
+        final Tweet bindingTweet = tweets.get(position);
         // Bind the Tweet with the ViewHolder
-        holder.bind(tweet);
+        holder.bind(bindingTweet);
 
-        final TextView tvRetweetCount = holder.tvRetweetCount;
-        final TextView tvFavoriteCount = holder.tvFavoriteCount;
-        final TextView tvReplyCount = holder.tvReplyCount;
-        final ImageView ivProfileImage  = holder.ivProfileImage;
-        final TextView tvScreenName  = holder.tvScreenName;
-        final LinearLayout llContent = holder.llContent;
-        final TextView tvBody = holder.tvBody;
-        final ImageView ivAttachedImage = holder.ivAttachedImage;
+        final TextView tvRetweetCount = binding.tvRetweetCount;
+        final TextView tvFavoriteCount = binding.tvFavoriteCount;
+        final TextView tvReplyCount = binding.tvReplyCount;
+        final ImageView ivProfileImage  = binding.ivProfileImage;
+        final TextView tvScreenName  = binding.tvScreenName;
+        final LinearLayout llContent = binding.llContent;
+        final TextView tvBody = binding.tvBody;
+        final ImageView ivAttachedImage = binding.ivAttachedImage;
 
-        getClickables(holder.tvBody, tweet);
+        getClickables(holder.tvBody, bindingTweet);
 
         tvReplyCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Show DialogFragment to create tweet
+                int position = holder.getAdapterPosition();
+                Tweet tweet = tweets.get(position);
                 FragmentManager fm = ((FragmentActivity) context).getSupportFragmentManager();
                 ComposeDialogFragment editNameDialogFragment = ComposeDialogFragment.newInstance(tweet);
                 editNameDialogFragment.show(fm, "fragment_compose");
@@ -98,6 +104,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             @Override
             public void onClick(View view) {
                 // Make Request to retweet post
+                int position = holder.getAdapterPosition();
+                final Tweet tweet = tweets.get(position);
                 client.toggleRetweet(tweet.retweeted, tweet.id, new JsonHttpResponseHandler() {
                     @SuppressLint("DefaultLocale")
                     @Override
@@ -108,6 +116,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                         int updatedCount = tweet.retweetCount;
                         if (tweet.retweeted) {
                             updatedImage = R.drawable.ic_vector_retweeted;
+                            updatedCount++;
                         } else {
                             updatedImage = R.drawable.ic_vector_retweet;
                             updatedCount--;
@@ -128,6 +137,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             @Override
             public void onClick(View view) {
                 // Make Request to favorite post
+                int position = holder.getAdapterPosition();
+                final Tweet tweet = tweets.get(position);
                 client.toggleFavorite(tweet.favorited, tweet.id, new JsonHttpResponseHandler() {
                     @SuppressLint("DefaultLocale")
                     @Override
@@ -138,6 +149,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                         int updatedCount = tweet.favoriteCount;
                         if (tweet.favorited) {
                             updatedImage = R.drawable.ic_vector_favorited;
+                            updatedCount++;
                         } else {
                             updatedImage = R.drawable.ic_vector_favorite;
                             updatedCount--;
@@ -157,6 +169,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         ivProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                int position = holder.getAdapterPosition();
+                Tweet tweet = tweets.get(position);
                 Log.d(TAG, "going to profile page");
                 Intent intent = new Intent(context, ProfileActivity.class);
                 intent.putExtra(User.class.getSimpleName(), Parcels.wrap(tweet.user));
@@ -167,14 +181,21 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         tvScreenName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                int position = holder.getAdapterPosition();
+                Tweet tweet = tweets.get(position);
                 Log.d(TAG, "going to profile page");
+                Intent intent = new Intent(context, ProfileActivity.class);
+                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(tweet.user));
+                context.startActivity(intent);
             }
         });
 
         llContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "going to details page");
+                int position = holder.getAdapterPosition();
+                Tweet tweet = tweets.get(position);
+                Log.d(TAG, "going to details page of tweet at position " + position);
                 Intent intent = new Intent(context, TweetDetailActivity.class);
                 intent.putExtra(Tweet.class.getSimpleName(), Parcels.wrap(tweet));
                 context.startActivity(intent);
@@ -184,7 +205,9 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         tvBody.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "going to details page");
+                int position = holder.getAdapterPosition();
+                Tweet tweet = tweets.get(position);
+                Log.d(TAG, "going to details page of tweet at position " + position);
                 Intent intent = new Intent(context, TweetDetailActivity.class);
                 intent.putExtra(Tweet.class.getSimpleName(), Parcels.wrap(tweet));
                 context.startActivity(intent);
@@ -193,7 +216,9 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         ivAttachedImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "going to details page");
+                int position = holder.getAdapterPosition();
+                Tweet tweet = tweets.get(position);
+                Log.d(TAG, "going to details page of tweet at position " + position);
                 Intent intent = new Intent(context, TweetDetailActivity.class);
                 intent.putExtra(Tweet.class.getSimpleName(), Parcels.wrap(tweet));
                 context.startActivity(intent);
@@ -289,15 +314,15 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         // itemView is a representation of one row in the RecyclerView (aka one Tweet)
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
-            tvScreenName = itemView.findViewById(R.id.tvScreenName);
-            tvBody = itemView.findViewById(R.id.tvBody);
-            cvAttachedImage = itemView.findViewById(R.id.cvAttachedImage);
-            ivAttachedImage = itemView.findViewById(R.id.ivAttachedImage);
-            tvReplyCount = itemView.findViewById(R.id.tvReplyCount);
-            tvRetweetCount = itemView.findViewById(R.id.tvRetweetCount);
-            tvFavoriteCount = itemView.findViewById(R.id.tvFavoriteCount);
-            llContent = itemView.findViewById(R.id.llContent);
+            ivProfileImage = binding.ivProfileImage;
+            tvScreenName = binding.tvScreenName;
+            tvBody = binding.tvBody;
+            cvAttachedImage = binding.cvAttachedImage;
+            ivAttachedImage = binding.ivAttachedImage;
+            tvReplyCount = binding.tvReplyCount;
+            tvRetweetCount = binding.tvRetweetCount;
+            tvFavoriteCount = binding.tvFavoriteCount;
+            llContent = binding.llContent;
         }
 
         @SuppressLint("SetTextI18n")
@@ -319,6 +344,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         private void addImageFromTweet(@NotNull Tweet tweet) {
             if (tweet.imageUrl.isEmpty()) {
                 cvAttachedImage.setVisibility(View.GONE);
+                cvAttachedImage.clearAnimation();
             } else {
                 Glide.with(context).load(tweet.imageUrl).into(ivAttachedImage);
             }

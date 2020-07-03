@@ -37,7 +37,7 @@ android {
 
     // If true, allows for binding. instead of findViewById()
     buildFeatures {
-        viewBinding false
+        viewBinding true
     }
 
     dexOptions {

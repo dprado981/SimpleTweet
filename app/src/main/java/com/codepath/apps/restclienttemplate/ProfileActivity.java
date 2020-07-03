@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.codepath.apps.restclienttemplate.databinding.ActivityProfileBinding;
 import com.codepath.apps.restclienttemplate.models.User;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
@@ -49,7 +51,10 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+
+        ActivityProfileBinding binding = ActivityProfileBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
 
         user = Parcels.unwrap(getIntent().getParcelableExtra(User.class.getSimpleName()));
         following = new ArrayList<>();
@@ -60,12 +65,12 @@ public class ProfileActivity extends AppCompatActivity {
         followerAdapter = new UsersAdapter(context, followers);
         followingAdapter = new UsersAdapter(context, following);
 
-        ivBanner = findViewById(R.id.ivBanner);
-        ivProfileImage = findViewById(R.id.ivProfileImage);
-        tvProfileName = findViewById(R.id.tvProfileName);
-        tvScreenName = findViewById(R.id.tvScreenName);
-        rvFollowers = findViewById(R.id.rvFollowers);
-        rvFollowing = findViewById(R.id.rvFollowing);
+        ivBanner = binding.ivBanner;
+        ivProfileImage = binding.ivProfileImage;
+        tvProfileName = binding.tvProfileName;
+        tvScreenName = binding.tvScreenName;
+        rvFollowers = binding.rvFollowers;
+        rvFollowing = binding.rvFollowing;
 
         LinearLayoutManager layoutManagerFollower = new LinearLayoutManager(context);
         rvFollowers.setLayoutManager(layoutManagerFollower);

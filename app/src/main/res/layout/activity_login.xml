@@ -16,6 +16,7 @@
         android:layout_margin="20dp"
         android:onClick="loginToRest"
         android:text="@string/login_label"
-        android:textColor="@color/primary_text"/>
+        android:textColor="@color/primary_text"
+        android:background="@color/twitter_blue"/>
 
 </RelativeLayout>

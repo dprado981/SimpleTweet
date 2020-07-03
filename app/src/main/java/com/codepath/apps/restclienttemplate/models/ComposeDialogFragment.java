@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.codepath.apps.restclienttemplate.R;
+import com.codepath.apps.restclienttemplate.databinding.FragmentComposeBinding;
 
 import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
@@ -29,6 +30,7 @@ public class ComposeDialogFragment extends DialogFragment {
     private TextView tvCount;
     private Button btnTweet;
     private Context context = getContext();
+    private FragmentComposeBinding binding;
 
     int charCount;
     Tweet tweet;
@@ -59,10 +61,12 @@ public class ComposeDialogFragment extends DialogFragment {
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentComposeBinding.inflate(getLayoutInflater(), container, false);
+        View view = binding.getRoot();
         if (getArguments() != null) {
             tweet = Parcels.unwrap(getArguments().getParcelable("tweet"));
         }
-        return inflater.inflate(R.layout.fragment_compose, container);
+        return view;
     }
 
     // TODO: Make separate for reply and tweet
@@ -75,6 +79,8 @@ public class ComposeDialogFragment extends DialogFragment {
         etCompose = view.findViewById(R.id.etCompose);
         tvCount = view.findViewById(R.id.tvCount);
         btnTweet = view.findViewById(R.id.btnTweet);
+
+        tvCount.setText(String.format("%-3d/%d", charCount, MAX_TWEET_LENGTH));
 
         // Fetch arguments from bundle and set title
         getDialog().setTitle("Tweet");
@@ -102,8 +108,11 @@ public class ComposeDialogFragment extends DialogFragment {
                 Log.d(TAG, "onTextChanged");
                 charCount = charSequence.length();
                 tvCount.setText(String.format("%-3d/%d", charCount, MAX_TWEET_LENGTH));
-                if (charCount >= MAX_TWEET_LENGTH) {
-                    tvCount.setTextColor(ContextCompat.getColor(context, R.color.accent_red));
+                if (charCount > MAX_TWEET_LENGTH) {
+                    tvCount.setTextColor(ContextCompat.getColor(tvCount.getContext(), R.color.accent_red));
+                }
+                if (charCount <= MAX_TWEET_LENGTH) {
+                    tvCount.setTextColor(ContextCompat.getColor(tvCount.getContext(), R.color.primary_text));
                 }
             }
 
@@ -116,10 +125,16 @@ public class ComposeDialogFragment extends DialogFragment {
         btnTweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ComposeDialogListener listener = (ComposeDialogListener) getActivity();
-                listener.onFinishComposeDialog(tweet.id + "/" + etCompose.getText().toString());
-                // Close the dialog and return back to the parent activity
-                dismiss();
+                if(etCompose.getText().length() <= MAX_TWEET_LENGTH) {
+                    String replyTo = "";
+                    if (tweet != null) {
+                        replyTo = String.valueOf(tweet.id);
+                    }
+                    ComposeDialogListener listener = (ComposeDialogListener) getActivity();
+                    listener.onFinishComposeDialog(replyTo + "/" + etCompose.getText().toString());
+                    // Close the dialog and return back to the parent activity
+                    dismiss();
+                }
             }
         });
     }

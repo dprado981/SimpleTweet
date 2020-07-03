@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.codepath.apps.restclienttemplate.databinding.ActivityTimelineBinding;
 import com.codepath.apps.restclienttemplate.models.ComposeDialogFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.apps.restclienttemplate.models.TweetDao;
@@ -53,7 +55,6 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_timeline);
 
         /* Try to get the name replaced with the icon
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -61,11 +62,15 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
         getSupportActionBar().setDisplayUseLogoEnabled(true);
          */
 
+        ActivityTimelineBinding binding = ActivityTimelineBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
+
         client = TwitterApp.getRestClient(context);
         tweetDao = ((TwitterApp) getApplicationContext()).getMyDatabase().tweetDao();
 
         // Find the RecyclerView
-        rvTweets = findViewById(R.id.rvTweets);
+        rvTweets = binding.rvTweets;
         // Initialize the list of Tweets and TweetAdapter
         tweets = new ArrayList<>();
         // RecyclerView setup: layout manager and the adapter
@@ -75,7 +80,7 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
         rvTweets.setAdapter(adapter);
 
         // Implement wipe to refresh
-        swipeContainer = findViewById(R.id.swipeContainer);
+        swipeContainer = binding.swipeContainer;
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -262,7 +267,7 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
                     Toast.makeText(context, "Nice Tweet!", Toast.LENGTH_LONG).show();
                     populateHomeTimeline();
                 } catch (JSONException e) {
-                    Log.e(TAG, "JSON exception");
+                    Log.e(TAG, "JSON exception:" + e);
                 }
             }
 

@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.codepath.apps.restclienttemplate.databinding.ItemProfileBinding;
 import com.codepath.apps.restclienttemplate.models.User;
 
 import java.util.List;
@@ -21,6 +22,9 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     Context context;
     List<User> users;
     TwitterClient client;
+
+    ItemProfileBinding binding;
+
     public static final String TAG = "UserAdapter";
 
     // Pass in the context and list of users
@@ -34,7 +38,9 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_profile, parent, false);
+        binding = ItemProfileBinding.inflate((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)
+                , parent, false);
+        View view = binding.getRoot();
         return new ViewHolder(view);
     }
 
@@ -73,9 +79,9 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         // itemView is a representation of one row in the RecyclerView (aka one User)
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
-            tvProfileName = itemView.findViewById(R.id.tvProfileName);
-            tvScreenName = itemView.findViewById(R.id.tvScreenName);
+            ivProfileImage = binding.ivProfileImage;
+            tvProfileName = binding.tvProfileName;
+            tvScreenName = binding.tvScreenName;
         }
 
         @SuppressLint("SetTextI18n")

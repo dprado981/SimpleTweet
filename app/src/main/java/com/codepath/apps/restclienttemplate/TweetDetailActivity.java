@@ -2,6 +2,7 @@ package com.codepath.apps.restclienttemplate;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -23,8 +24,10 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
+import com.codepath.apps.restclienttemplate.databinding.ActivityDetailBinding;
 import com.codepath.apps.restclienttemplate.models.ComposeDialogFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.apps.restclienttemplate.models.User;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.jetbrains.annotations.NotNull;
@@ -56,20 +59,23 @@ public class TweetDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+
+        ActivityDetailBinding binding = ActivityDetailBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
 
         tweet = Parcels.unwrap(getIntent().getParcelableExtra(Tweet.class.getSimpleName()));
         context = this;
         client = TwitterApp.getRestClient(context);
 
-        ivProfileImage = findViewById(R.id.ivProfileImage);
-        tvScreenName = findViewById(R.id.tvScreenName);
-        tvBody = findViewById(R.id.tvBody);
-        cvAttachedImage = findViewById(R.id.cvAttachedImage);
-        ivAttachedImage = findViewById(R.id.ivAttachedImage);
-        tvReplyCount = findViewById(R.id.tvReplyCount);
-        tvRetweetCount = findViewById(R.id.tvRetweetCount);
-        tvFavoriteCount = findViewById(R.id.tvFavoriteCount);
+        ivProfileImage = binding.ivProfileImage;
+        tvScreenName = binding.tvScreenName;
+        tvBody = binding.tvBody;
+        cvAttachedImage = binding.cvAttachedImage;
+        ivAttachedImage = binding.ivAttachedImage;
+        tvReplyCount = binding.tvReplyCount;
+        tvRetweetCount = binding.tvRetweetCount;
+        tvFavoriteCount = binding.tvFavoriteCount;
 
         bind(tweet);
 
@@ -99,6 +105,7 @@ public class TweetDetailActivity extends AppCompatActivity {
                         int updatedCount = tweet.retweetCount;
                         if (tweet.retweeted) {
                             updatedImage = R.drawable.ic_vector_retweeted;
+                            updatedCount++;
                         } else {
                             updatedImage = R.drawable.ic_vector_retweet;
                             updatedCount--;
@@ -129,6 +136,7 @@ public class TweetDetailActivity extends AppCompatActivity {
                         int updatedCount = tweet.favoriteCount;
                         if (tweet.favorited) {
                             updatedImage = R.drawable.ic_vector_favorited;
+                            updatedCount++;
                         } else {
                             updatedImage = R.drawable.ic_vector_favorite;
                             updatedCount--;
@@ -142,6 +150,24 @@ public class TweetDetailActivity extends AppCompatActivity {
                         Log.d(TAG, "onFailure for toggleFavorite: " + response, throwable);
                     }
                 });
+            }
+        });
+
+        ivProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ProfileActivity.class);
+                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(tweet.user));
+                context.startActivity(intent);
+            }
+        });
+
+        tvScreenName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ProfileActivity.class);
+                intent.putExtra(User.class.getSimpleName(), Parcels.wrap(tweet.user));
+                context.startActivity(intent);
             }
         });
 
@@ -211,6 +237,7 @@ public class TweetDetailActivity extends AppCompatActivity {
     private void addImageFromTweet(@NotNull Tweet tweet) {
         if (tweet.imageUrl.isEmpty()) {
             cvAttachedImage.setVisibility(View.GONE);
+            cvAttachedImage.clearAnimation();
         } else {
             Glide.with(context).load(tweet.imageUrl)
                     .placeholder(R.drawable.ic_twitter_logo_blue).into(ivAttachedImage);
